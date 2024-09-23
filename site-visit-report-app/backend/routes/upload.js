@@ -1,12 +1,13 @@
 const express = require('express');
 const multer = require('multer');
+const OpenAIApi = require('openai');
 const router = express.Router();
+require('dotenv').config();
 
 // Set up Multer for handling file uploads (stored in memory)
 const upload = multer({ storage: multer.memoryStorage() });
 
-// OpenAI API configuration (ensure your .env has the OPENAI_API_KEY)
-const OpenAIApi = require('openai');
+// OpenAI API configuration
 const openai = new OpenAIApi({ key: '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'});
 
 // Route to generate description based on uploaded photos
@@ -17,22 +18,24 @@ router.post('/generate-description', upload.array('photos', 10), async (req, res
     return res.status(400).json({ error: 'No photos uploaded' });
   }
 
-  // Simulate generating a prompt using the uploaded photos.
-  const prompt = `Generate a site visit report description based on the following photos: ${photos.map((photo, index) => `photo ${index + 1}`).join(', ')}.`;
+  // For simplicity, simulate the image description
+  const imageDescriptions = photos.map((photo, index) => `Image ${index + 1}: ${photo.originalname}`).join(', ');
+
+  const prompt = `Generate a site visit report based on the following image descriptions: ${imageDescriptions}.`;
 
   try {
-    // Make the call to OpenAI's GPT-4 to generate the description
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: prompt,
+    // Call the OpenAI API to generate the description using GPT-4
+    const response = await openai.createChatCompletion({
+      model: "gpt-4",
+      messages: [{ role: "system", content: prompt }],
       max_tokens: 300,
     });
 
     // Extract the generated description
-    const description = response.data.choices[0].text.trim();
-    res.json({ description }); // Return the generated description
+    const description = response.data.choices[0].message.content.trim();
+    res.json({ description });
   } catch (error) {
-    console.error('Error generating description:', error);
+    console.error('Error generating description:', error.response ? error.response.data : error.message);  // Log detailed error
     res.status(500).json({ error: 'Error generating description' });
   }
 });

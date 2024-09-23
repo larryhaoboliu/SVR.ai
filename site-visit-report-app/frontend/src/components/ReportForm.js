@@ -14,7 +14,7 @@ const ReportForm = () => {
     setPhotos([...e.target.files]);
   };
 
-  // Function to generate description using GPT-4
+  // Function to generate description using Flask API and GPT-4
   const generateDescription = () => {
     if (photos.length === 0) {
       alert('Please upload photos before generating the description.');
@@ -22,19 +22,25 @@ const ReportForm = () => {
     }
 
     const formData = new FormData();
-    photos.forEach((photo, i) => formData.append(`photos`, photo));  // Add files to FormData
+    formData.append('image', photos[0]); // Send only the first image for simplicity
 
-    // Call the backend API to generate description
-    axios.post('/api/generate-description', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+    // Call the Flask API to analyze the image
+    fetch('http://localhost:5001/analyze-image', {
+      method: 'POST',
+      body: formData,
     })
-    .then(response => {
-      setDescription(response.data.description); // Automatically populate the description field
-    })
-    .catch(error => {
-      console.error('Error generating description:', error);
-      alert('Error generating description. Please try again.');
-    });
+      .then(response => response.json())
+      .then(data => {
+        if (data.description) {
+          setDescription(data.description); // Populate the description field
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error generating description. Please try again.');
+      });
   };
 
   // Handle form submission
@@ -68,7 +74,7 @@ const ReportForm = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container mx-auto p-4">
       <form onSubmit={handleSubmit}>
         {/* Project and report inputs */}
         <div className="form-group">
