@@ -2,11 +2,16 @@ import base64
 import requests
 from flask import Flask, request, jsonify
 import os
+from flask_cors import CORS
+
+
+# Your existing code...
 
 app = Flask(__name__)
+CORS(app)  # This allows your React app to make requests to the Flask backend
 
-# OpenAI API Key
-api_key = os.getenv("OPENAI_API_KEY")  # It's better to use environment variables for security
+# OpenAI API Key (load from environment or replace with your API key)
+api_key = os.getenv("OPENAI_API_KEY", "your-openai-api-key")  # Replace with your API key
 
 # Function to encode the image to base64
 def encode_image(image_file):
@@ -30,14 +35,14 @@ def analyze_image():
         }
 
         payload = {
-            "model": "gpt-4o-mini",  # Use the correct GPT model
+            "model": "gpt-4o",  # Use the correct model for image analysis
             "messages": [
                 {
                     "role": "user",
                     "content": [
                         {
                             "type": "text",
-                            "text": "What’s in this image?"
+                            "text": "Describe the content of this image."
                         },
                         {
                             "type": "image_url",
@@ -56,7 +61,9 @@ def analyze_image():
 
         # Return the generated description or error
         if response.status_code == 200:
-            return jsonify(response.json())
+            data = response.json()
+            description = data['choices'][0]['message']['content']  # Adjust this based on the response structure
+            return jsonify({"description": description})
         else:
             app.logger.error(f"OpenAI API error: {response.status_code} - {response.text}")
             return jsonify({"error": response.text}), response.status_code

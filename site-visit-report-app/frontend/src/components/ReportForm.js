@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const ReportForm = () => {
-  const [projectName, setProjectName] = useState('100 Roy Street'); 
-  const [reportNumber, setReportNumber] = useState('SV.24');
+  const [projectName, setProjectName] = useState(''); 
+  const [reportNumber, setReportNumber] = useState('');
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState(''); 
   const [action, setAction] = useState('');

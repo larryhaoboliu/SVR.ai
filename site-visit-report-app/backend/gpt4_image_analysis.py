@@ -10,7 +10,10 @@ def encode_image(image_path):
     return base64.b64encode(image_file.read()).decode('utf-8')
 
 # Path to your image
-image_path = "C:/Larry/apple.jpg"
+image_path = "/Users/haobo2022/Documents/SVR_ai/apple.jpg"
+
+# "/Users/haobo2022/Documents/SVR_ai/apple.jpg"
+# "C:/Larry/apple.jpg"
 
 # Getting the base64 string
 base64_image = encode_image(image_path)
