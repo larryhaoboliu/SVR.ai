@@ -8,7 +8,7 @@ require('dotenv').config();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // OpenAI API configuration
-const openai = new OpenAIApi({ key: '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'});
+const openai = new OpenAIApi({ key: ''});
 
 // Route to generate description based on uploaded photos
 router.post('/generate-description', upload.array('photos', 10), async (req, res) => {
